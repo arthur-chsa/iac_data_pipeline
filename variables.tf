@@ -32,12 +32,6 @@ variable "composer_bucket_name" {
   description = "Name for the Cloud Composer storage bucket"
 }
 
-variable "composer_bucket_location" {
-  type        = string
-  description = "Location for the Cloud Composer storage bucket. Defaults to region if not specified."
-  default     = null
-}
-
 variable "composer_bucket_iam_bindings" {
   type = list(object({
     member = string
