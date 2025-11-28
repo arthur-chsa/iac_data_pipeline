@@ -41,6 +41,7 @@ resource "google_composer_environment" "cloud_composer" {
       airflow_config_overrides = {
         # By enabling this, Airflow will create roles per folder inside the GCS bucket
         webserver-rbac_autoregister_per_folder_roles = "True"
+        webserver-rbac_user_registration_role = "UserNoDags"
       }
 
       image_version = "composer-3-airflow-3.1.0-build.2"
@@ -49,11 +50,7 @@ resource "google_composer_environment" "cloud_composer" {
     node_config {
       service_account = google_service_account.cloud_composer.name
     }
-
-    airflow_config_overrides {
-      webserver-rbac_autoregister_per_folder_roles = "True"
-      webserver-rbac_user_registration_role = "UserNoDags"
-    }
+    
   }
 
   storage_config {
