@@ -1,22 +1,9 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 6.0"
-    }
-  }
-}
-
-provider "google" {
-  project     = var.project_id
-  region      = var.region
-  credentials = var.google_credentials
-}
-
 resource "google_project_iam_member" "cloud_composer" {
   member  = "serviceAccount:${google_service_account.cloud_composer.email}"
   project = var.project_id
   role    = "roles/composer.worker"
+
+  depends_on = [google_service_account.cloud_composer]
 }
 
 resource "google_service_account" "cloud_composer" {
@@ -57,16 +44,36 @@ resource "google_composer_environment" "cloud_composer" {
     bucket = google_storage_bucket.composer_bucket.name
   }
 
-  depends_on = [google_storage_bucket.composer_bucket]
+  depends_on = [
+    google_storage_bucket.composer_bucket,
+    google_project_iam_member.cloud_composer,
+    google_storage_bucket_iam_member.composer_bucket_iam
+  ]
+}
+
+locals {
+  # Default roles for Cloud Composer service account
+  default_sa_roles = [
+    {
+      member = "serviceAccount:${google_service_account.cloud_composer.email}"
+      role   = "roles/storage.objectAdmin"
+    }
+  ]
+  
+  # Concatenate default roles with provided bindings
+  all_iam_bindings = concat(local.default_sa_roles, var.composer_bucket_iam_bindings)
 }
 
 resource "google_storage_bucket_iam_member" "composer_bucket_iam" {
   for_each = {
-    for idx, binding in var.composer_bucket_iam_bindings : "${binding.member}-${binding.role}" => binding
+    for idx, binding in local.all_iam_bindings : "${binding.member}-${binding.role}" => binding
   }
 
   bucket     = google_storage_bucket.composer_bucket.name
   role       = each.value.role
   member     = each.value.member
-  depends_on = [google_storage_bucket.composer_bucket]
+  depends_on = [
+    google_storage_bucket.composer_bucket,
+    google_service_account.cloud_composer
+  ]
 }

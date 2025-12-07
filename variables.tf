@@ -1,35 +1,37 @@
 variable "project_id" {
-  type = string
+  type        = string
+  description = "GCP project ID"
 }
+
 variable "region" {
-  type    = string
-  default = "europe-west3"
+  type        = string
+  description = "GCP region"
 }
 
 variable "google_credentials" {
-  description = "GCP credentials in JSON format"
   type        = string
+  description = "GCP credentials JSON"
   sensitive   = true
 }
 
 variable "service_account_name" {
   type        = string
-  description = "Name for the Cloud Composer service account"
+  description = "Cloud Composer service account name"
 }
 
 variable "service_account_display_name" {
   type        = string
-  description = "Display name for the Cloud Composer service account"
-}
-
-variable "composer_environment_name" {
-  type        = string
-  description = "Name for the Cloud Composer environment"
+  description = "Cloud Composer service account display name"
 }
 
 variable "composer_bucket_name" {
   type        = string
-  description = "Name for the Cloud Composer storage bucket"
+  description = "Cloud Composer storage bucket name"
+}
+
+variable "composer_environment_name" {
+  type        = string
+  description = "Cloud Composer environment name"
 }
 
 variable "composer_bucket_iam_bindings" {
@@ -37,6 +39,6 @@ variable "composer_bucket_iam_bindings" {
     member = string
     role   = string
   }))
-  description = "List of IAM bindings for the Cloud Composer storage bucket. Each binding should have member (e.g., serviceAccount:...) and role (e.g., roles/storage.objectViewer)."
+  description = "IAM bindings for Cloud Composer bucket"
   default     = []
 }
