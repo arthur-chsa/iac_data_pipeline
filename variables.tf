@@ -6,6 +6,7 @@ variable "project_id" {
 variable "region" {
   type        = string
   description = "GCP region"
+  default     = "europe-west3"
 }
 
 variable "google_credentials" {
